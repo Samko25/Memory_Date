@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malo iznenađenje ✨</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1, h2, .romantic-font {
+            font-family: 'Caveat', cursive;
+        }
+        
+        /* Memory Game Styles - 4x4 Grid */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        .memory-card {
+            aspect-ratio: 1/1;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        
+        .memory-card.flipped .memory-card-inner,
+        .memory-card.matched .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .memory-card-front, .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .memory-card-front {
+            background: linear-gradient(135deg, #c74d6e 0%, #8f3b57 100%);
+            color: white;
+            font-size: 1.8rem;
+            font-family: 'Caveat', cursive;
+        }
+        
+        .memory-card-back {
+            background-color: white;
+            transform: rotateY(180deg);
+            font-size: 1.8rem;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* Subtle Floating Heart Animation */
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8); opacity: 1; }
+            100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+        }
+        .subtle-heart {
+            position: fixed;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 50;
+            animation: floatUp 1.5s ease-out forwards;
+            color: #94a3b8; /* Neutral color, not too flashy */
+        }
+    </style>
+</head>
+<body class="text-gray-800 p-4 pb-12 w-full">
+
+    <!-- SCREEN 1: Memory Game -->
+    <div id="screen-1" class="w-full max-w-md mx-auto mt-4 transition-opacity duration-500">
+        <div class="text-center mb-6">
+            <h1 class="text-4xl text-slate-600 mb-2">Ćaooo Zalto Moje ❤️</h1>
+            <p class="text-sm text-gray-500 px-4">Prije nego što nastavimo, pronađi sve parove!</p>
+        </div>
+        
+        <div class="memory-grid" id="game-board">
+            <!-- Kartice se dodaju preko JavaScripta -->
+        </div>
+    </div>
+
+    <!-- SCREEN 2: Date Selection Form (Hidden Initially) -->
+    <div id="screen-2" class="w-full max-w-md mx-auto mt-8 hidden opacity-0 transition-opacity duration-500">
+        <div class="text-center mb-8">
+            <h1 class="text-5xl text-slate-700 mb-2">Pobijedila si! 🎉</h1>
+            <p class="text-sm text-gray-600 px-4">Sada je red na tebe. Šta ti zvuči najbolje?</p>
+        </div>
+
+        <form id="date-form" class="space-y-6">
+            
+            <!-- Pitanje 1: Aktivnost -->
+            <div class="bg-white/70 p-5 rounded-2xl shadow-sm backdrop-blur-sm border border-slate-100">
+                <h2 class="text-2xl text-slate-700 mb-3 text-center">Šta ćemo raditi?</h2>
+                <select id="activity" class="w-full p-4 rounded-xl border-2 border-slate-200 bg-white text-gray-700 outline-none focus:border-slate-400 transition-colors shadow-sm appearance-none cursor-pointer" required>
+                    <option value="" disabled selected>Izaberi aktivnost...</option>
+                    <option value="Blaubeuern-Specijal">Blaubeuern-Specijal ✨</option>
+                    <option value="Svjetlosni šou Ludwigsburg (samo ti i ja)">Svjetlosni Show Ludwigsburg 🌟 (samo ti i ja)</option>
+                    <option value="Kino">Kino 🍿</option>
+                    <option value="Ulm-Specijal">Ulm-Specijal 🎨</option>
+                </select>
+            </div>
+
+            <!-- Pitanje 2: Datum -->
+            <div class="bg-white/70 p-5 rounded-2xl shadow-sm backdrop-blur-sm border border-slate-100">
+                <h2 class="text-2xl text-slate-700 mb-3 text-center">Kada?</h2>
+                <select id="date-select" class="w-full p-4 rounded-xl border-2 border-slate-200 bg-white text-gray-700 outline-none focus:border-slate-400 transition-colors shadow-sm appearance-none cursor-pointer" required>
+                    <option value="" disabled selected>Izaberi datum...</option>
+                    <option value="27. Oktobar">27. Oktobar</option>
+                    <option value="28. Oktobar">28. Oktobar</option>
+                    <option value="30. Oktobar">30. Oktobar</option>
+                    <option value="2. Novembar">2. Novembar</option>
+                    <option value="3. Novembar">3. Novembar</option>
+                    <option value="4. Novembar">4. Novembar</option>
+                    <option value="5. Novembar">5. Novembar</option>
+                    <option value="6. Novembar">6. Novembar</option>
+                    <option value="7. Novembar">7. Novembar</option>
+                    <option value="8. Novembar">8. Novembar</option>
+                    <option value="9. Novembar">9. Novembar</option>
+                    <option value="10. Novembar">10. Novembar</option>
+                    <option value="11. Novembar">11. Novembar</option>
+                </select>
+            </div>
+
+            <!-- Dugme za slanje -->
+            <button type="submit" class="w-full bg-slate-700 text-white font-semibold text-lg py-4 rounded-xl shadow-md hover:shadow-lg hover:bg-slate-800 transform transition active:scale-95 mt-4">
+                Pošalji odgovor ✉️
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // --- MEMORY GAME LOGIC ---
+        // 8 parova neutralnih/zabavnih emojija
+        const emojis = ['🌟', '🍕', '🎬', '🚗', '🎨', '☕', '🎮', '❤️'];
+        let cards = [...emojis, ...emojis]; 
+        let hasFlippedCard = false;
+        let lockBoard = false;
+        let firstCard, secondCard;
+        let matchedPairs = 0;
+
+        // Shuffle funkcija
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Inicijalizacija igre
+        function initGame() {
+            const board = document.getElementById('game-board');
+            shuffle(cards);
+            
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.emoji = emoji;
+                card.innerHTML = `
+                    <div class="memory-card-inner">
+                        <div class="memory-card-front">?</div>
+                        <div class="memory-card-back">${emoji}</div>
+                    </div>
+                `;
+                card.addEventListener('click', flipCard);
+                board.appendChild(card);
+            });
+        }
+
+        function flipCard() {
+            if (lockBoard) return;
+            if (this === firstCard) return;
+
+            this.classList.add('flipped');
+
+            if (!hasFlippedCard) {
+                hasFlippedCard = true;
+                firstCard = this;
+                return;
+            }
+
+            secondCard = this;
+            checkForMatch();
+        }
+
+        function checkForMatch() {
+            let isMatch = firstCard.dataset.emoji === secondCard.dataset.emoji;
+            isMatch ? disableCards() : unflipCards();
+        }
+
+        function disableCards() {
+            firstCard.removeEventListener('click', flipCard);
+            secondCard.removeEventListener('click', flipCard);
+            firstCard.classList.add('matched');
+            secondCard.classList.add('matched');
+            
+            // Suptilna animacija - samo 1-2 srca
+            createSubtleHearts(firstCard);
+
+            resetBoard();
+            matchedPairs++;
+
+            // Ako su svi parovi pronađeni (8 parova)
+            if (matchedPairs === emojis.length) {
+                setTimeout(showScreen2, 1000);
+            }
+        }
+
+        function unflipCards() {
+            lockBoard = true;
+            setTimeout(() => {
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                resetBoard();
+            }, 1000);
+        }
+
+        function resetBoard() {
+            [hasFlippedCard, lockBoard] = [false, false];
+            [firstCard, secondCard] = [null, null];
+        }
+
+        // Suptilna srca
+        function createSubtleHearts(element) {
+            const rect = element.getBoundingClientRect();
+            // Pravimo samo 1 ili 2 mala, siva/neutralna srca
+            const numHearts = Math.floor(Math.random() * 2) + 1; 
+            
+            for(let i=0; i<numHearts; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('subtle-heart');
+                heart.style.left = (rect.left + (rect.width/2) + (Math.random() * 20 - 10)) + 'px';
+                heart.style.top = (rect.top + (Math.random() * 10)) + 'px';
+                document.body.appendChild(heart);
+                
+                setTimeout(() => heart.remove(), 1500);
+            }
+        }
+
+        // --- TRANSITIONS ---
+        function showScreen2() {
+            const screen1 = document.getElementById('screen-1');
+            const screen2 = document.getElementById('screen-2');
+            
+            screen1.classList.add('opacity-0');
+            setTimeout(() => {
+                screen1.classList.add('hidden');
+                screen2.classList.remove('hidden');
+                setTimeout(() => {
+                    screen2.classList.remove('opacity-0');
+                }, 50);
+            }, 500);
+        }
+
+        // --- MAILTO LOGIC ---
+        document.getElementById('date-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const activity = document.getElementById('activity').value;
+            const date = document.getElementById('date-select').value;
+            
+            const subject = "Odgovor za dejt";
+            const body = `Ćao!\n\nMoja odluka je:\nŠta: ${activity}\nKada: ${date}\n\nVidimo se! 😊`;
+            
+            // Kreiramo mailto link (encodeURIComponent osigurava da razmaci i čšćž rade ispravno)
+            const mailtoLink = `mailto:samirmasic25@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Otvaramo email klijent
+            window.location.href = mailtoLink;
+        });
+
+        // Start game on load
+        window.onload = initGame;
+    </script>
+</body>
+</html>
